@@ -76,6 +76,21 @@ export default function Director() {
       d
     )
 
+    // Doors: open just after the headlights, hold, then close as the car turns.
+    if (refs.doors && refs.doors.length) {
+      let dOpen = 0
+      if (p > 0.14 && p < 0.3) {
+        if (p < 0.2) dOpen = (p - 0.14) / 0.06
+        else if (p < 0.24) dOpen = 1
+        else dOpen = 1 - (p - 0.24) / 0.06
+      }
+      dOpen = MathUtils.clamp(dOpen, 0, 1)
+      const e = dOpen * dOpen * (3 - 2 * dOpen) // smoothstep
+      for (const d of refs.doors) {
+        d.pivot.rotation.y = MathUtils.damp(d.pivot.rotation.y, e * d.angle, 8, dt)
+      }
+    }
+
     // Car rotation.
     if (refs.carRig.current) {
       refs.carRig.current.rotation.y = MathUtils.damp(

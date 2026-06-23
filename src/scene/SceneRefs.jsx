@@ -11,6 +11,7 @@ function makeRefs() {
     headlights: [], // materials -> emissive white
     taillights: [], // materials -> emissive red
     grille: [], // materials -> emissive accent (front badge/kidney)
+    doors: [], // [{ pivot, angle }] hinge groups for open/close
     paint: [], // CarPaint materials -> body color
     // ignition multipliers (0..1) animated by the preloader handoff
     ignite: { head: 0, tail: 0 },

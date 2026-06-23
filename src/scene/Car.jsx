@@ -1,7 +1,9 @@
 import { useLayoutEffect, useRef } from 'react'
 import { useGLTF } from '@react-three/drei'
-import { Box3, Vector3, Color } from 'three'
+import { Box3, Vector3, Color, Group } from 'three'
 import { useSceneRefs } from './SceneRefs.jsx'
+
+const DOOR_RE = /Door_(FL|FR|BL|BR)/
 
 const MODEL_URL = '/models/bmw-330i.glb'
 const CAR_LENGTH = 4.5 // target world length (meters)
@@ -30,6 +32,7 @@ export default function Car() {
     const taillights = []
     const grille = []
     const paintSet = new Set()
+    const doorMeshes = { FL: [], FR: [], BL: [], BR: [] }
     let frontProbe = null
     let rearProbe = null
 
@@ -96,6 +99,10 @@ export default function Car() {
         grille.push(...cloneAndEmissive(o, GRILLE_EMISSIVE))
         if (!frontProbe) frontProbe = o
       }
+
+      // DOORS — collect each door's meshes for the open/close rig.
+      const dm = name.match(DOOR_RE)
+      if (dm) doorMeshes[dm[1]].push(o)
     })
 
     // World-space center of a mesh's geometry (node origins are baked at the
@@ -147,7 +154,33 @@ export default function Car() {
     root.position.y -= box.min.y
     root.updateMatrixWorld(true)
 
+    // ---- Door open/close rig: re-parent each door's meshes to a hinge pivot ----
+    const doors = []
+    const tmpBox = new Box3()
+    for (const key of ['FL', 'FR', 'BL', 'BR']) {
+      const meshes = doorMeshes[key]
+      if (!meshes.length) continue
+      const dbox = new Box3()
+      for (const m of meshes) {
+        if (!m.geometry.boundingBox) m.geometry.computeBoundingBox()
+        tmpBox.copy(m.geometry.boundingBox).applyMatrix4(m.matrixWorld)
+        dbox.union(tmpBox)
+      }
+      const c = dbox.getCenter(new Vector3())
+      // hinge = front (nose-ward, +X) vertical edge of the door
+      const hingeWorld = new Vector3(dbox.max.x, c.y, c.z)
+      const pivot = new Group()
+      root.add(pivot)
+      pivot.position.copy(root.worldToLocal(hingeWorld.clone()))
+      root.updateMatrixWorld(true)
+      for (const m of meshes) pivot.attach(m)
+      // swing the door's rear edge outward (away from the centreline)
+      const sign = c.z >= 0 ? 1 : -1
+      doors.push({ pivot, angle: sign * 1.05 })
+    }
+
     // Publish handles.
+    refs.doors = doors
     refs.carRig.current = rigRef.current
     refs.headlights = headlights
     refs.taillights = taillights
