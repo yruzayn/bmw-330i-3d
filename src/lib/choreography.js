@@ -36,7 +36,7 @@ export const KEYFRAMES = [
     env: 0.03,
     studio: 0,
     headlights: 1.0,
-    taillights: 0.12,
+    taillights: 0.55,
   },
   {
     // 00c — HERO TEXT. Car emerges from darkness; headline reveals. Straight front.
@@ -51,7 +51,7 @@ export const KEYFRAMES = [
     env: 0.24,
     studio: 0,
     headlights: 1.0,
-    taillights: 0.16,
+    taillights: 0.5,
   },
   {
     // 01 — OVERVIEW. The car begins to rotate toward a front-3/4.

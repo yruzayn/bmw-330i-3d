@@ -12,30 +12,37 @@ const fragmentShader = /* glsl */ `
 
   float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 
+  // a single small raindrop ripple inside a cell
+  float drop(vec2 gv, vec2 nid){
+    float h = hash(nid);
+    float h2 = hash(nid + 4.3);
+    float period = 0.9 + h * 0.9;                 // quick lifecycle
+    float ph = fract(uTime / period + h);          // 0..1
+    vec2 c = (vec2(hash(nid + 1.7), hash(nid + 9.1)) - 0.5) * 0.72;
+    float d = length(gv - c);
+    float radius = ph * 0.30;                       // small max radius
+    float ring = smoothstep(0.022, 0.0, abs(d - radius));        // thin leading ring
+    float ring2 = smoothstep(0.05, 0.0, abs(d - radius * 0.55)) * 0.35; // soft inner
+    float life = pow(1.0 - ph, 1.8);                // fade quickly as it dies
+    float born = smoothstep(0.0, 0.06, ph);         // pop in
+    return (ring + ring2) * life * born * (0.55 + 0.45 * h2);
+  }
+
   void main(){
-    vec2 uv = vUv * 15.0;            // cells across the plane
+    vec2 uv = vUv * 34.0;            // denser, smaller cells
     vec2 id = floor(uv);
     vec2 gv = fract(uv) - 0.5;
     float acc = 0.0;
     for (int y = -1; y <= 1; y++) {
       for (int x = -1; x <= 1; x++) {
         vec2 nid = id + vec2(float(x), float(y));
-        float h = hash(nid);
-        float h2 = hash(nid + 3.3);
-        vec2 center = vec2(float(x), float(y)) + (vec2(hash(nid + 1.0), hash(nid + 2.0)) - 0.5) * 0.6;
-        float d = length(gv - center);
-        float period = 1.5 + h * 1.6;
-        float ph = fract(uTime / period + h);     // 0..1 ripple life
-        float radius = ph * 0.5;
-        float ring = smoothstep(0.045, 0.0, abs(d - radius));
-        float life = 1.0 - ph;
-        acc += ring * life * life * (0.45 + 0.55 * h2);
+        acc += drop(gv - vec2(float(x), float(y)), nid);
       }
     }
-    float fade = smoothstep(1.0, 0.2, length(vUv - 0.5) * 2.0); // concentrate near centre
+    float fade = smoothstep(1.0, 0.15, length(vUv - 0.5) * 2.0); // concentrate near the car
     float a = clamp(acc, 0.0, 1.0) * uOpacity * fade;
-    if (a < 0.01) discard;
-    gl_FragColor = vec4(vec3(0.66, 0.74, 0.9), a);
+    if (a < 0.008) discard;
+    gl_FragColor = vec4(vec3(0.62, 0.71, 0.86), a);
   }
 `
 

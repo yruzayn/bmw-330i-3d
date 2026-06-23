@@ -9,7 +9,7 @@ import {
 } from 'three'
 import { useSceneRefs } from './SceneRefs.jsx'
 
-const COUNT = 6000
+const COUNT = 8500
 const AREA = 30 // horizontal spread around the camera
 const HEIGHT = 26 // vertical fall range
 
@@ -21,14 +21,18 @@ const vertexShader = /* glsl */ `
   attribute float aScale;
   attribute float aRand;
   varying float vRand;
+  varying float vDepth;
   void main() {
     vRand = aRand;
     vec3 p = position;
     // continuous fall, wrapped into [0, uHeight]
     p.y = mod(p.y - uTime * aSpeed + aRand * uHeight, uHeight);
+    // slight wind shear so the rain isn't perfectly vertical
+    p.x += (p.y / uHeight) * 1.4;
     vec4 mv = modelViewMatrix * vec4(p, 1.0);
+    vDepth = -mv.z;
     gl_Position = projectionMatrix * mv;
-    gl_PointSize = clamp(uSize * aScale * (60.0 / -mv.z), 4.0, 64.0);
+    gl_PointSize = clamp(uSize * aScale * (55.0 / -mv.z), 3.0, 52.0);
   }
 `
 
@@ -36,13 +40,16 @@ const fragmentShader = /* glsl */ `
   uniform float uOpacity;
   uniform vec3 uColor;
   varying float vRand;
+  varying float vDepth;
   void main() {
     vec2 c = gl_PointCoord - 0.5;
     // thin vertical streak: very narrow in x, soft along y
-    float streak = smoothstep(0.5, 0.0, abs(c.x) * 7.0);
-    float vert = smoothstep(0.5, -0.35, c.y); // brighter near the head of the drop
-    float a = streak * (0.25 + 0.75 * vert) * uOpacity * (0.6 + 0.4 * vRand);
-    if (a < 0.012) discard;
+    float streak = smoothstep(0.5, 0.0, abs(c.x) * 10.0);
+    float vert = smoothstep(0.5, -0.4, c.y); // brighter near the head of the drop
+    // fade distant rain so depth reads
+    float depthFade = 1.0 - clamp((vDepth - 3.0) / 26.0, 0.0, 1.0) * 0.7;
+    float a = streak * (0.2 + 0.8 * vert) * uOpacity * (0.45 + 0.55 * vRand) * depthFade;
+    if (a < 0.01) discard;
     gl_FragColor = vec4(uColor, a);
   }
 `

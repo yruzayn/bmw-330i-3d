@@ -19,3 +19,13 @@ export function onProgress(fn) {
   listeners.add(fn)
   return () => listeners.delete(fn)
 }
+
+// Single source of scroll progress for the 3D scene. In dev, a `window.__forceP`
+// override pins it (the preview screenshot tool moves the real scroll position,
+// so this lets us verify a specific moment).
+export function getProgress() {
+  if (import.meta.env.DEV && typeof window !== 'undefined' && window.__forceP != null) {
+    return window.__forceP
+  }
+  return scrollState.progress
+}

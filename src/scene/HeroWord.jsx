@@ -2,44 +2,57 @@ import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Text, Billboard } from '@react-three/drei'
 import { MathUtils } from 'three'
-import { scrollState } from '../lib/scroll.js'
+import { getProgress } from '../lib/scroll.js'
 
-// A giant wordmark living IN the 3D scene, set behind the car so the car body
-// genuinely occludes it (real depth, not a flat overlay). Fades out as you
-// leave the hero so it never floats behind later shots.
+// A giant "330i" set BEHIND the car (toward the rear), revealed as the
+// headlights come on — coloured like the red taillights it sits in front of,
+// with a real red point light spilling onto the car's rear and the wet ground.
 export default function HeroWord() {
   const ref = useRef()
+  const redLight = useRef()
 
   useFrame(() => {
-    const p = scrollState.progress
-    // appear WITH the hero text (after the headlights), then fade as the car
-    // starts to rotate away from the head-on intro.
-    const fadeIn = MathUtils.clamp((p - 0.08) / 0.05, 0, 1)
-    const fadeOut = MathUtils.clamp(1 - (p - 0.16) / 0.08, 0, 1)
+    const p = getProgress()
+    // appear with the headlights, fade as the car starts to rotate away
+    const fadeIn = MathUtils.clamp((p - 0.035) / 0.04, 0, 1)
+    const fadeOut = MathUtils.clamp(1 - (p - 0.15) / 0.07, 0, 1)
     const o = Math.min(fadeIn, fadeOut)
-    if (!ref.current) return
-    ref.current.visible = o > 0.001
-    ref.current.fillOpacity = o * 0.5
-    ref.current.outlineOpacity = o * 0.45
+    if (ref.current) {
+      ref.current.visible = o > 0.001
+      ref.current.fillOpacity = o
+      ref.current.outlineOpacity = o * 0.6
+    }
+    if (redLight.current) redLight.current.intensity = o * 22
   })
 
   return (
-    <Billboard position={[0, 2.0, -3.4]}>
-      <Text
-        ref={ref}
-        fontSize={2.7}
-        anchorX="center"
-        anchorY="middle"
-        letterSpacing={-0.03}
-        color="#566072"
-        fillOpacity={0.55}
-        outlineWidth={0.012}
-        outlineColor="#aab4c8"
-        outlineOpacity={0.5}
-        material-toneMapped={false}
-      >
-        330i
-      </Text>
-    </Billboard>
+    <group>
+      {/* red taillight wash onto the car's rear + wet ground */}
+      <pointLight
+        ref={redLight}
+        position={[-2.3, 0.95, 0]}
+        color="#ff2030"
+        intensity={0}
+        distance={9}
+        decay={2}
+      />
+      <Billboard position={[-5.2, 2.2, 0]}>
+        <Text
+          ref={ref}
+          fontSize={4.4}
+          anchorX="center"
+          anchorY="middle"
+          letterSpacing={-0.03}
+          color="#c0242e"
+          fillOpacity={0}
+          outlineWidth={0.012}
+          outlineColor="#ff5560"
+          outlineOpacity={0}
+          material-toneMapped={false}
+        >
+          330i
+        </Text>
+      </Billboard>
+    </group>
   )
 }

@@ -2,7 +2,7 @@ import { useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import { MathUtils, Vector3 } from 'three'
 import { sampleChoreo, createChoreoState } from '../lib/choreography.js'
-import { scrollState } from '../lib/scroll.js'
+import { getProgress } from '../lib/scroll.js'
 import { useSceneRefs } from './SceneRefs.jsx'
 
 const HEAD_MAX = 7.0
@@ -15,6 +15,8 @@ export default function Director() {
   const choreo = useRef(createChoreoState()).current
   const camPos = useRef(new Vector3(4.6, 1.15, 5.0)).current
   const camTarget = useRef(new Vector3(0.4, 0.7, 0)).current
+  if (import.meta.env.DEV && typeof window !== 'undefined') window.__three = { scene, camera }
+
   const studioActive = useRef(false)
   const studioCss = useRef('')
   const started = useRef(false)
@@ -25,7 +27,7 @@ export default function Director() {
 
   useFrame((state, dt) => {
     const d = Math.min(dt, 0.05)
-    const p = scrollState.progress
+    const p = getProgress()
     sampleChoreo(p, choreo)
 
     // Snap on first frame and under reduced-motion, then damp for silk.

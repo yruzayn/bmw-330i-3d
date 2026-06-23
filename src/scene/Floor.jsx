@@ -10,15 +10,15 @@ export default function Floor({ quality = 'high' }) {
         <planeGeometry args={[200, 200]} />
         <MeshReflectorMaterial
           resolution={res}
-          mixBlur={1}
-          mixStrength={1.5}
-          blur={quality === 'high' ? [300, 90] : [120, 60]}
-          depthScale={1.1}
-          minDepthThreshold={0.4}
-          maxDepthThreshold={1.2}
-          roughness={0.85}
-          metalness={0.6}
-          color="#050506"
+          mixBlur={0.7}
+          mixStrength={2.4}
+          blur={quality === 'high' ? [180, 50] : [110, 50]}
+          depthScale={1.15}
+          minDepthThreshold={0.3}
+          maxDepthThreshold={1.3}
+          roughness={0.42}
+          metalness={0.85}
+          color="#040406"
           mirror={0}
         />
       </mesh>

@@ -11,6 +11,7 @@
   --ease-inout: cubic-bezier(0.76, 0, 0.24, 1);
   --font-display: 'Oswald', 'Arial Narrow', sans-serif;
   --font-body: 'Inter', system-ui, sans-serif;
+  --font-serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
 }
 
 * {
@@ -152,11 +153,13 @@ a {
   mix-blend-mode: difference;
 }
 .hero__sub {
-  margin-top: 18px;
-  font-size: clamp(12px, 1vw, 15px);
-  letter-spacing: 0.42em;
-  text-transform: uppercase;
-  color: var(--muted);
+  margin-top: 16px;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(19px, 1.7vw, 28px);
+  letter-spacing: 0.005em;
+  text-transform: none;
+  color: rgba(243, 244, 246, 0.82);
 }
 .hero__scrollcue {
   position: absolute;
@@ -235,7 +238,12 @@ a {
   text-transform: uppercase;
   letter-spacing: -0.01em;
 }
-.stat .unit { color: var(--accent); }
+.stat .unit {
+  color: var(--accent);
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+}
 
 /* spec grid (engine) */
 .specgrid {
@@ -482,6 +490,41 @@ a {
   text-transform: uppercase;
   color: var(--text);
   min-width: 96px;
+}
+
+/* ---------- SOUND TOGGLE ---------- */
+.sound {
+  position: fixed;
+  left: clamp(16px, 3vw, 40px);
+  bottom: clamp(18px, 4vh, 38px);
+  z-index: 26;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border: 1px solid var(--line);
+  border-radius: 100px;
+  background: rgba(8, 9, 11, 0.5);
+  backdrop-filter: blur(10px);
+  pointer-events: auto;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 10px;
+  cursor: pointer;
+  transition: color 0.4s var(--ease), border-color 0.4s var(--ease);
+}
+.sound:hover { color: var(--text); border-color: var(--rule-hi, rgba(255, 255, 255, 0.22)); }
+.sound.is-on { color: var(--text); }
+.sound__bars { display: flex; align-items: flex-end; gap: 2px; height: 13px; }
+.sound__bars i { width: 2px; height: 3px; background: currentColor; border-radius: 1px; }
+.sound.is-on .sound__bars i { animation: eq 1s ease-in-out infinite; }
+.sound.is-on .sound__bars i:nth-child(2) { animation-delay: 0.18s; }
+.sound.is-on .sound__bars i:nth-child(3) { animation-delay: 0.36s; }
+.sound.is-on .sound__bars i:nth-child(4) { animation-delay: 0.54s; }
+@keyframes eq {
+  0%, 100% { height: 3px; }
+  50% { height: 13px; }
 }
 
 /* ---------- CUSTOM CURSOR ---------- */

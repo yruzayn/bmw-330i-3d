@@ -21,6 +21,7 @@ export default function SmoothScroll() {
       smoothTouch: false,
     })
     lenisHolder.instance = lenis
+    if (import.meta.env.DEV) window.__lenis = lenis
     lenis.stop() // released by the preloader handoff
     if (lenisHolder.wantStart) lenis.start() // handoff already happened
 

@@ -9,6 +9,7 @@ import Counter from './components/Counter.jsx'
 import HUD from './components/HUD.jsx'
 import PaintSwitcher from './components/PaintSwitcher.jsx'
 import Cursor from './components/Cursor.jsx'
+import SoundToggle from './components/SoundToggle.jsx'
 import Overlay from './components/Overlay.jsx'
 
 export default function App() {
@@ -34,6 +35,7 @@ export default function App() {
       <Counter />
       <HUD />
       <PaintSwitcher visible={chromeIn} />
+      <SoundToggle />
 
       <Overlay />
 
