@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { SECTIONS } from '../lib/sections.js'
+import { onProgress } from '../lib/scroll.js'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -121,6 +122,7 @@ export default function Overlay() {
 
   useEffect(() => {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const unsubs = []
     const ctx = gsap.context((self) => {
       const sections = self.selector('.section')
       sections.forEach((sec) => {
@@ -133,19 +135,47 @@ export default function Overlay() {
           gsap.set(pops, { opacity: 1 })
           return
         }
-        const tl = gsap.timeline({
-          scrollTrigger: { trigger: sec, start: 'top 74%', once: false, toggleActions: 'play none none reverse' },
-        })
-        if (lines.length)
-          tl.to(lines, { y: '0%', duration: 0.9, ease: 'power4.out', stagger: 0.08 }, 0)
-        if (fades.length)
-          tl.to(fades, { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out', stagger: 0.06 }, 0.15)
-        if (pops.length)
-          tl.to(pops, { opacity: 1, duration: 0.8, ease: 'power2.out', stagger: 0.08 }, 0.35)
+        const build = (tl) => {
+          if (lines.length)
+            tl.to(lines, { y: '0%', duration: 0.9, ease: 'power4.out', stagger: 0.08 }, 0)
+          if (fades.length)
+            tl.to(fades, { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out', stagger: 0.06 }, 0.15)
+          if (pops.length)
+            tl.to(pops, { opacity: 1, duration: 0.8, ease: 'power2.out', stagger: 0.08 }, 0.35)
+        }
+
+        // The HERO reveals only after the headlights ignite (driven by scroll
+        // progress), not at the very top while the scene is still dark + raining.
+        if (sec.id === 'hero') {
+          const tl = gsap.timeline({ paused: true })
+          build(tl)
+          let played = false
+          unsubs.push(
+            onProgress((p) => {
+              if (p > 0.09 && !played) {
+                played = true
+                tl.play()
+              } else if (p <= 0.04 && played) {
+                played = false
+                tl.reverse()
+              }
+            })
+          )
+          return
+        }
+
+        build(
+          gsap.timeline({
+            scrollTrigger: { trigger: sec, start: 'top 74%', once: false, toggleActions: 'play none none reverse' },
+          })
+        )
       })
     }, rootRef)
 
-    return () => ctx.revert()
+    return () => {
+      unsubs.forEach((u) => u())
+      ctx.revert()
+    }
   }, [])
 
   return (

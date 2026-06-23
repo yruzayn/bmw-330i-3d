@@ -25,7 +25,8 @@ export default function Director() {
 
   useFrame((state, dt) => {
     const d = Math.min(dt, 0.05)
-    sampleChoreo(scrollState.progress, choreo)
+    const p = scrollState.progress
+    sampleChoreo(p, choreo)
 
     // Snap on first frame and under reduced-motion, then damp for silk.
     const lambda = reduced ? 1e6 : started.current ? 5.5 : 1000
@@ -96,6 +97,10 @@ export default function Director() {
       for (const m of refs.paint) m.color.copy(refs.paintColorCurrent)
       refs.settle.v = MathUtils.damp(refs.settle.v, 0, 4, d)
     }
+
+    // Publish studio amount + intro light level for other scene elements.
+    refs.studio = choreo.studio
+    refs.lights = MathUtils.smoothstep(p, 0.045, 0.15) // 0 in the dark intro → 1 after
 
     // DOM flip in lockstep with the studio value.
     const wantStudio = choreo.studio > 0.5

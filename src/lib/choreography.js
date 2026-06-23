@@ -9,23 +9,53 @@ const D2R = Math.PI / 180
 // revolution — motion always reads forward). Units are world meters; FOV 38°.
 export const KEYFRAMES = [
   {
-    // 00 — HERO. Front 3/4 emerging from the void; headlights + grille ignite.
-    at: 0.06,
-    pos: [4.6, 1.15, 5.0],
-    target: [0.4, 0.7, 0],
-    carYaw: -18,
-    bg: '#040405',
+    // 00a — INTRO. Complete darkness, only rain. Head-on FRONT, car dead straight.
+    at: 0.0,
+    pos: [6.4, 1.06, 0.0],
+    target: [0, 0.72, 0],
+    carYaw: 0,
+    bg: '#000000',
+    fogNear: 5,
+    fogFar: 18,
+    exposure: 0.78,
+    env: 0.0,
+    studio: 0,
+    headlights: 0.0,
+    taillights: 0.0,
+  },
+  {
+    // 00b — LIGHTS. Headlights ignite in the dark. Still straight, body still black.
+    at: 0.05,
+    pos: [6.4, 1.06, 0.0],
+    target: [0, 0.72, 0],
+    carYaw: 0,
+    bg: '#010103',
+    fogNear: 5,
+    fogFar: 18,
+    exposure: 0.92,
+    env: 0.03,
+    studio: 0,
+    headlights: 1.0,
+    taillights: 0.12,
+  },
+  {
+    // 00c — HERO TEXT. Car emerges from darkness; headline reveals. Straight front.
+    at: 0.12,
+    pos: [5.9, 1.08, 0.35],
+    target: [0, 0.74, 0],
+    carYaw: 0,
+    bg: '#050506',
     fogNear: 7,
     fogFar: 20,
     exposure: 1.0,
-    env: 0.28,
+    env: 0.24,
     studio: 0,
     headlights: 1.0,
-    taillights: 0.18,
+    taillights: 0.16,
   },
   {
-    // 01 — OVERVIEW. Rotate toward the side; cool rim separates car from void.
-    at: 0.22,
+    // 01 — OVERVIEW. The car begins to rotate toward a front-3/4.
+    at: 0.214,
     pos: [1.0, 1.3, 6.2],
     target: [0, 0.85, 0],
     carYaw: -62,
@@ -40,7 +70,7 @@ export const KEYFRAMES = [
   },
   {
     // 02 — DESIGN. The FLIP — decisive snap to high-key studio, clean profile.
-    at: 0.38,
+    at: 0.357,
     pos: [0.0, 1.05, 6.7],
     target: [0, 0.8, 0],
     carYaw: -180,
@@ -55,7 +85,7 @@ export const KEYFRAMES = [
   },
   {
     // 03 — PERFORMANCE. Dark slams back; rear 3/4, taillights fire hard.
-    at: 0.54,
+    at: 0.5,
     pos: [-4.4, 1.05, 4.8],
     target: [-0.4, 0.7, 0],
     carYaw: -285,
@@ -70,7 +100,7 @@ export const KEYFRAMES = [
   },
   {
     // 04 — REAR / EXHAUST. Straight-on low rear hero.
-    at: 0.69,
+    at: 0.643,
     pos: [-5.6, 0.95, 1.8],
     target: [-1.0, 0.6, 0],
     carYaw: -340,
@@ -85,7 +115,7 @@ export const KEYFRAMES = [
   },
   {
     // 05 — ASSIST. High side sweep.
-    at: 0.82,
+    at: 0.786,
     pos: [-2.6, 2.6, 5.2],
     target: [-0.2, 0.65, 0],
     carYaw: -390,
@@ -100,7 +130,7 @@ export const KEYFRAMES = [
   },
   {
     // 06 — POWERTRAIN / OUTRO. Pull back to front-side; re-ignite everything.
-    at: 0.97,
+    at: 0.95,
     pos: [5.0, 1.5, 5.6],
     target: [0, 0.8, 0],
     carYaw: -408,
@@ -126,14 +156,14 @@ function smootherstep(t) {
 
 export function createChoreoState() {
   return {
-    pos: new Vector3(4.6, 1.15, 5.0),
-    target: new Vector3(0.4, 0.7, 0),
-    bg: new Color('#050506'),
+    pos: new Vector3(6.4, 1.06, 0.0),
+    target: new Vector3(0, 0.72, 0),
+    bg: new Color('#000000'),
     carYaw: 0,
-    fogNear: 7,
-    fogFar: 22,
-    exposure: 1.0,
-    env: 0.42,
+    fogNear: 5,
+    fogFar: 18,
+    exposure: 0.16,
+    env: 0.0,
     studio: 0,
     headlights: 0,
     taillights: 0,

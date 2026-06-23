@@ -18,6 +18,8 @@ function makeRefs() {
     paintColor: new Color('#0a0e14'),
     paintColorCurrent: new Color('#0a0e14'),
     settle: { v: 0 }, // small extra yaw "settle" when switching paint
+    studio: 0, // live studio-flip amount (0 dark .. 1 studio), published by Director
+    lights: 1, // scene-light level (0 during the dark intro .. 1 after), by Director
     ready: false,
   }
 }

@@ -11,18 +11,23 @@ export default function HeroWord() {
   const ref = useRef()
 
   useFrame(() => {
-    const o = MathUtils.clamp(1 - scrollState.progress / 0.1, 0, 1)
+    const p = scrollState.progress
+    // appear WITH the hero text (after the headlights), then fade as the car
+    // starts to rotate away from the head-on intro.
+    const fadeIn = MathUtils.clamp((p - 0.08) / 0.05, 0, 1)
+    const fadeOut = MathUtils.clamp(1 - (p - 0.16) / 0.08, 0, 1)
+    const o = Math.min(fadeIn, fadeOut)
     if (!ref.current) return
     ref.current.visible = o > 0.001
-    ref.current.fillOpacity = o * 0.55
-    ref.current.outlineOpacity = o * 0.5
+    ref.current.fillOpacity = o * 0.5
+    ref.current.outlineOpacity = o * 0.45
   })
 
   return (
-    <Billboard position={[-2.3, 1.85, -2.7]}>
+    <Billboard position={[0, 2.0, -3.4]}>
       <Text
         ref={ref}
-        fontSize={3.1}
+        fontSize={2.7}
         anchorX="center"
         anchorY="middle"
         letterSpacing={-0.03}
