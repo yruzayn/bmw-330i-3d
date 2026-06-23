@@ -1,0 +1,5 @@
+node_modules
+dist
+tmp-*.glb
+*.local
+.DS_Store
