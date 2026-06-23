@@ -8,7 +8,6 @@ import Env from './Env.jsx'
 import Floor from './Floor.jsx'
 import Road from './Road.jsx'
 import Rain from './Rain.jsx'
-import RainRipples from './RainRipples.jsx'
 import Car from './Car.jsx'
 import HeroWord from './HeroWord.jsx'
 import Effects from './Effects.jsx'
@@ -58,7 +57,6 @@ export default function Experience() {
       </Suspense>
 
       <Rain />
-      <RainRipples />
 
       <Effects quality={quality} />
     </Canvas>
