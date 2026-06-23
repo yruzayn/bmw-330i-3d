@@ -131,3 +131,9 @@ export function playIgnition() {
 export function resetIgnition() {
   ignited = false
 }
+
+export function debugState() {
+  return ctx ? { state: ctx.state, master: +master.gain.value.toFixed(2), enabled } : null
+}
+
+if (import.meta.env.DEV && typeof window !== 'undefined') window.__audioState = debugState
