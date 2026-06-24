@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 
 export default function Cursor() {
   useEffect(() => {
+    if (new URLSearchParams(window.location.search).has('capture')) return
     if (window.matchMedia('(pointer: coarse)').matches) return
 
     const dot = document.createElement('div')

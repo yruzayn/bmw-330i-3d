@@ -4,11 +4,13 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { setProgress } from '../lib/scroll.js'
 import { lenisHolder } from '../lib/lenis.js'
+import { CAPTURE } from '../lib/capture.js'
 
 gsap.registerPlugin(ScrollTrigger)
 
 export default function SmoothScroll() {
   useEffect(() => {
+    if (CAPTURE) return // capture harness drives scroll deterministically
     // Always begin at the hero so the preloader → ignition sequence plays.
     if ('scrollRestoration' in history) history.scrollRestoration = 'manual'
     window.scrollTo(0, 0)

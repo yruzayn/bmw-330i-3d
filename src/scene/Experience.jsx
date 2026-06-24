@@ -11,6 +11,8 @@ import Rain from './Rain.jsx'
 import Car from './Car.jsx'
 import HeroWord from './HeroWord.jsx'
 import Effects from './Effects.jsx'
+import CaptureRig from './CaptureRig.jsx'
+import { CAPTURE } from '../lib/capture.js'
 
 const isCoarse =
   typeof window !== 'undefined' &&
@@ -25,11 +27,13 @@ export default function Experience() {
     <div className="canvas-fixed">
     <Canvas
       style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
-      dpr={dpr}
+      dpr={CAPTURE ? 1 : dpr}
+      frameloop={CAPTURE ? 'never' : 'always'}
       gl={{
         antialias: true,
         alpha: false,
         powerPreference: 'high-performance',
+        preserveDrawingBuffer: CAPTURE,
         toneMapping: ACESFilmicToneMapping,
         outputColorSpace: SRGBColorSpace,
       }}
@@ -38,13 +42,16 @@ export default function Experience() {
       <color attach="background" args={['#050506']} />
       <fog attach="fog" args={['#050506', 7, 22]} />
 
-      <PerformanceMonitor
-        onDecline={() => {
-          setQuality('low')
-          setDpr(1.25)
-        }}
-      />
+      {!CAPTURE && (
+        <PerformanceMonitor
+          onDecline={() => {
+            setQuality('low')
+            setDpr(1.25)
+          }}
+        />
+      )}
 
+      {CAPTURE && <CaptureRig />}
       <Director />
       <Lights />
 

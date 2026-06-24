@@ -11,6 +11,7 @@ import PaintSwitcher from './components/PaintSwitcher.jsx'
 import Cursor from './components/Cursor.jsx'
 import SoundToggle from './components/SoundToggle.jsx'
 import Overlay from './components/Overlay.jsx'
+import { CAPTURE } from './lib/capture.js'
 
 export default function App() {
   // Reveal the chrome (paint switcher) shortly after first paint.
@@ -39,7 +40,7 @@ export default function App() {
 
       <Overlay />
 
-      <Preloader />
+      {!CAPTURE && <Preloader />}
     </SceneRefsProvider>
   )
 }
