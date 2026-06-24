@@ -1,10 +1,8 @@
-// Lightweight Web Audio engine — rain ambience + an ignition swell, synthesized
-// so it needs no assets and works offline. Audio is created lazily on the first
-// user gesture (enable), satisfying browser autoplay rules. Drop a real engine
-// sample in later by replacing playIgnition() with a buffer source if desired.
+// Lightweight Web Audio engine — just the ignition swell, synthesized so it
+// needs no assets and works offline. Audio is created lazily on the first user
+// gesture (enable), satisfying browser autoplay rules. (Rain ambience removed.)
 let ctx = null
 let master = null
-let rainGain = null
 let enabled = false
 let ignited = false
 
@@ -15,41 +13,6 @@ function build() {
   master = ctx.createGain()
   master.gain.value = 0
   master.connect(ctx.destination)
-
-  // ---- rain ambience: brown-ish noise through band shaping ----
-  const len = Math.floor(ctx.sampleRate * 4)
-  const buf = ctx.createBuffer(1, len, ctx.sampleRate)
-  const data = buf.getChannelData(0)
-  let last = 0
-  for (let i = 0; i < len; i++) {
-    const white = Math.random() * 2 - 1
-    last = (last + 0.02 * white) / 1.02
-    data[i] = white * 0.35 + last * 2.2
-  }
-  const src = ctx.createBufferSource()
-  src.buffer = buf
-  src.loop = true
-  const hp = ctx.createBiquadFilter()
-  hp.type = 'highpass'
-  hp.frequency.value = 420
-  const lp = ctx.createBiquadFilter()
-  lp.type = 'lowpass'
-  lp.frequency.value = 6500
-  rainGain = ctx.createGain()
-  rainGain.gain.value = 0.34
-  // gentle "wind" wobble on the lowpass for life
-  const lfo = ctx.createOscillator()
-  const lfoGain = ctx.createGain()
-  lfo.frequency.value = 0.08
-  lfoGain.gain.value = 1400
-  lfo.connect(lfoGain)
-  lfoGain.connect(lp.frequency)
-  lfo.start()
-  src.connect(hp)
-  hp.connect(lp)
-  lp.connect(rainGain)
-  rainGain.connect(master)
-  src.start()
 }
 
 export function setEnabled(on) {
