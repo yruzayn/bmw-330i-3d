@@ -15,7 +15,8 @@ export default function Director() {
   const choreo = useRef(createChoreoState()).current
   const camPos = useRef(new Vector3(4.6, 1.15, 5.0)).current
   const camTarget = useRef(new Vector3(0.4, 0.7, 0)).current
-  if (import.meta.env.DEV && typeof window !== 'undefined') window.__three = { scene, camera }
+  if (import.meta.env.DEV && typeof window !== 'undefined')
+    window.__three = { scene, camera, clock: useThree((s) => s.clock) }
 
   const studioActive = useRef(false)
   const studioCss = useRef('')
