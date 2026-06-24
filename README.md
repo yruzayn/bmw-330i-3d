@@ -1,19 +1,34 @@
-# BMW 330i — "NOCTURNE/330"
+# BMW 330i — Immersive 3D Scroll Experience
 
-An award-grade, dark-theme 3D product site for the BMW 330i. As you scroll, a
-single normalized progress value drives the camera, the car's rotation, the
-lighting, the background, and the typography — one continuous cinematic shot
-broken into seven panels.
+A dark, cinematic, scroll-driven 3D product site for the BMW 330i. A single
+normalized scroll value drives the camera, the car, the lighting, the weather,
+the audio, and the typography — one continuous shot from a rainy black void to a
+full spec reveal.
 
-![hero](public/models/) <!-- see live -->
+## The scroll sequence
+
+1. **Complete dark + rain** — the car is hidden; rain falls and beads on the wet road
+2. **Headlights ignite** — head-on and dead straight, only the emissive headlights cut the dark (engine ignition sound fires)
+3. **Red "330i" + text** — a giant red wordmark rises behind the car, lit by the red taillights spilling onto the wet ground; the headline reveals
+4. **Doors open** — the car's doors swing open, then close as it turns
+5. **Studio flip** — background snaps to a high-key studio for a clean side profile
+6. **Performance** — rear-3/4, taillights blazing, a live 0–100 km/h telemetry read-out
+7. **Rear / assist / powertrain** — exhaust, driver-assist, and the full spec grid
+
+## Highlights
+
+- **Real reflections** — a night-city HDRI lights the scene; the clearcoat paint and wet road reflect it physically
+- **Wet asphalt road** — real PBR asphalt textures; ripples distort the actual reflections via an animated water-normal (no fake glow rings)
+- **GPU rain** — shader-based rain with depth falloff and wind shear
+- **Rigged doors** — each door hinged at its front edge, opening/closing on scroll
+- **Audio** — synthesized engine-ignition swell on headlights-on, with a sound toggle (autoplay-safe)
+- **Live PBR paint switcher** — recolour the car's clearcoat in real time
+- **Bold automotive typography** — wide industrial Archivo Expanded display type
+- **Smooth scroll** — Lenis + GSAP, aspect-aware framing for mobile
 
 ## Stack
 
-- **React 18 + Vite**
-- **three.js r168** via **@react-three/fiber** + **@react-three/drei**
-- **@react-three/postprocessing** — Bloom / Vignette / Noise / Chromatic Aberration
-- **GSAP + ScrollTrigger** — text reveals, preloader, ignition
-- **Lenis** — smooth scroll (feeds the single scroll-progress value)
+React 18 · Vite · three.js r168 · @react-three/fiber + drei · @react-three/postprocessing (Bloom/Vignette/Noise/CA) · GSAP + ScrollTrigger · Lenis · Web Audio.
 
 ## Run
 
@@ -23,50 +38,22 @@ npm run dev      # http://localhost:5173
 npm run build    # production build -> dist/
 ```
 
+The optimized Draco model, HDRI, and PBR textures are committed, so it runs out
+of the box. Scroll from the very top for the full sequence; click anywhere (or
+scroll) once to enable sound.
+
 ## The 3D model
 
-The source asset `G:/Downloads/bmw-330i/source/BMW 330i.glb` is **54.6 MB** — far
-too heavy for the web. The committed `public/models/bmw-330i.glb` is a **~5 MB**
-optimized build (Draco geometry + resized WebP textures). Regenerate it with:
+Source `BMW 330i.glb` is 54.6 MB; the committed `public/models/bmw-330i.glb` is a
+~5 MB Draco + WebP build. Regenerate with `npm run optimize:model` (see
+`scripts/optimize-model.mjs` — a discrete resize → webp → draco pipeline that
+preserves node names so the light/door rigs keep working).
 
-```bash
-npm run optimize:model
-```
+## Project map
 
-This runs a **discrete** `resize -> webp -> draco` pipeline (see
-`scripts/optimize-model.mjs`). It deliberately avoids `gltf-transform optimize`,
-whose mesh-joining would merge the headlight/taillight clusters and break the
-per-light ignition.
-
-The Draco decoders are vendored in `public/draco/` so the site works offline.
-
-## How it works
-
-- **`src/lib/choreography.js`** — the keyframe timeline. Each keyframe holds a
-  camera position/target, car yaw, background, fog, exposure, environment
-  intensity, and headlight/taillight levels. `sampleChoreo(p)` interpolates
-  between keyframes with smootherstep (no per-frame allocations).
-- **`src/scene/Director.jsx`** — the single `useFrame` that reads the scroll
-  progress and applies everything (camera, car rotation, tone, emissives, the
-  DOM studio-flip). Aspect-aware framing widens the FOV on narrow viewports.
-- **`src/scene/Car.jsx`** — loads the GLB, hides the authored backdrop, caches
-  material handles (`CarPaint`, headlight/taillight lenses, grille), and
-  normalizes the model at runtime (scale to 4.5 m, nose to +X, wheels to y=0).
-- **`src/lib/scroll.js` + `src/components/SmoothScroll.jsx`** — Lenis writes a
-  single `progress` value consumed by the Director and the UI chrome.
-
-### Signature moments
-
-1. **Headlight ignition** — fired as the preloader iris reveals the hero (real
-   bulb-inrush flicker + screen flash).
-2. **Dark → studio flip** (section 02) — canvas background, fog, exposure,
-   environment and the DOM text colour all invert from one shared value.
-3. **Live PBR paint switcher + telemetry HUD** — recolour the car's clearcoat in
-   real time; the 0–100 km/h read-out tracks the performance panel.
-
-## Tuning
-
-All shot composition lives in `KEYFRAMES` in `src/lib/choreography.js` — edit a
-keyframe's `pos`, `target`, `carYaw`, `bg`, `headlights`, etc. and it updates
-live. Section copy is in `src/lib/sections.js`; paint options in
-`src/lib/paints.js`.
+- `src/lib/choreography.js` — the keyframe timeline (camera, car, lights, weather)
+- `src/scene/Director.jsx` — the single `useFrame` that applies it all
+- `src/scene/Car.jsx` — GLB load, normalize, light + door rigs
+- `src/scene/{Rain,Floor,Road,Env,HeroWord}.jsx` — weather, wet road, HDRI, red wordmark
+- `src/lib/audio.js` — Web Audio ignition
+- `src/lib/sections.js` / `paints.js` — copy + paint options
